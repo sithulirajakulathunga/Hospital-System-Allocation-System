@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int specialtyID = {1,2,3,4};
+int specialtyID[]= {1,2,3,4};
 char specialtyName [][40]={
     "General Practice (OPD)",
     "Paediatrics",
@@ -53,8 +53,21 @@ int main()
               printf("Patient Registration Selected\n");
               break;
           case 2:
-              printf("Display Bed Availability Selected\n");
-              break;
+              printf("========Bed Availability========\n");
+                for (int i=0; i<4; i++){
+                    printf("%s:\n",wardName[i]);
+                    for(int j=0; j< bedCapacity[i];j++){
+                        if(bedOccupancy[i][j]==0){
+                            printf("Bed %02d is Available\n",j+1 );
+                        }
+                        else{
+                            printf("Bed %02d is Occupied\n",j+1);
+                        }
+
+                    }
+                }
+                break;
+
           case 3:
               printf("Patient Records Selected\n");
               break;
