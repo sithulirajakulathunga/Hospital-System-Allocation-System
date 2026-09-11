@@ -1,6 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int specialtyID = {1,2,3,4};
+char specialtyName [][40]={
+    "General Practice (OPD)",
+    "Paediatrics",
+    "Cardiology",
+    "Neurology"
+};
+float consultationFee[]={
+    1500.00,
+    2500.00,
+    4500.00,
+    5000.00
+};
+int consultationTime[]={15,20,30,30};
+int dailyPatientCap[]= {30,20,12,10};
+int wardID[]={1,2,3,4};
+char wardName[][40]={
+     "General Ward",
+     "Paediatric Ward",
+     "Surgical Ward",
+     "ICU"
+};
+float wardDailyRate[]={
+     3000.00,
+     6000.00,
+     12000.00,
+     25000.00
+};
+int bedCapacity[]={20,10,10,5};
+int bedOccupancy[4][20]={0};
+
+
 int main()
 {
     int choice;
@@ -21,7 +53,7 @@ int main()
               printf("Patient Registration Selected\n");
               break;
           case 2:
-              printf("Bed Availability Selected\n");
+              printf("Display Bed Availability Selected\n");
               break;
           case 3:
               printf("Patient Records Selected\n");
