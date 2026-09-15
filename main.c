@@ -100,7 +100,26 @@ int main()
                 break;
 
           case 3:
-              printf("Patient Records Selected\n");
+              printf("======== Patient Records ========\n");
+              if (patientCount==0){
+                printf("No Patients Registerd.\n");
+              }
+              else{
+                for (int i =0; i<patientCount; i++){
+                    printf("Patient %d\n", i+1);
+                    printf("Name: %s\n",patientName[i]);
+                    printf("Age:%d\n",patientAge[i]);
+                    printf("Emergency Level:%d\n",emergencyLevel[i]);
+                    printf("Specialty ID:%d\n",patientSpecialty[i]);
+                            if(admittedToWard[i]==1){
+                                printf("Ward ID: %d\n",patientWard[i]);
+                                printf("Days Admitted: %d\n", daysAdmitted[i]);
+                            }
+                            else {
+                                printf("Patient is not admitted to a ward (Outpatient/OPD)\n");
+                            }
+                }
+              }
               break;
           case 4:
               printf("Generate Reports Selected\n");
