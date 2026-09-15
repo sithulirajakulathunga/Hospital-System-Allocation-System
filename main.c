@@ -45,6 +45,7 @@ int patientCount = 0;
 int main()
 {
     int choice;
+    do{
 
     printf("=========================================================\n");
     printf("     Smart Hospital & Resource Allocation System\n");
@@ -129,7 +130,8 @@ int main()
               break;
           default:
               printf("Invalid Choice,Please Try Again.\n");
-     }
+       }
+     }while(choice !=5);
     return 0;
 
 }
