@@ -31,6 +31,15 @@ float wardDailyRate[]={
 };
 int bedCapacity[]={20,10,10,5};
 int bedOccupancy[4][20]={0};
+int patientName[100][50];
+int patientAge[100];
+int emergencyLevel[100];
+int patientSpecialty[100];
+int admittedToWard[100];
+int daysAdmitted[100];
+int patientWard[100];
+int patientCount = 0;
+
 
 
 int main()
@@ -50,10 +59,32 @@ int main()
 
        switch(choice){
           case 1:
-              printf("Patient Registration Selected\n");
+              printf("======== Patient Registration ========\n");
+              printf("Please Enter Patient Name:  ");
+              scanf(" %[^\n]",patientName[patientCount]);
+              printf("Please Enter Patient Age:  ");
+              scanf("%d", &patientAge[patientCount]);
+              printf("Please Enter Emergency Level (1=Normal, 2=Urgent, 3=Critical,):");
+              scanf("%d", &emergencyLevel[patientCount]);
+              printf("Please Enter Specialty ID (1-4):");
+              scanf("%d", &patientSpecialty[patientCount]);
+              printf("Is Patient Admitted to the Ward? (1=Yes, 0=No):");
+              scanf("%d", &admittedToWard[patientCount]);
+                   if (admittedToWard[patientCount]==1){
+                    printf("Please Enter Ward ID (1-4):");
+                    scanf("%d", &patientWard[patientCount]);
+                    printf("Please Enter Days Admitted: ");
+                    scanf("%d", &daysAdmitted[patientCount]);
+                   }
+                   else{
+                    patientWard[patientCount]=0;
+                    daysAdmitted[patientCount]=0;
+                   }
+                   patientCount++;
+                   printf("Patient Registration is Successful!\n");
               break;
           case 2:
-              printf("========Bed Availability========\n");
+              printf("======== Bed Availability ========\n");
                 for (int i=0; i<4; i++){
                     printf("%s:\n",wardName[i]);
                     for(int j=0; j< bedCapacity[i];j++){
