@@ -38,9 +38,14 @@ int patientSpecialty[100];
 int admittedToWard[100];
 int daysAdmitted[100];
 int patientWard[100];
+int specialyQueueCount[4]={0};
+int waitingTime[100];
 int patientCount = 0;
 
-
+int calculateWaitingTime(int specialyQueueCount,int consultationTime)
+{
+        return specialyQueueCount * consultationTime;
+}
 
 int main()
 {
@@ -69,6 +74,17 @@ int main()
               scanf("%d", &emergencyLevel[patientCount]);
               printf("Please Enter Specialty ID (1-4):");
               scanf("%d", &patientSpecialty[patientCount]);
+
+              int specialty = patientSpecialty[patientCount]-1;
+
+              waitingTime[patientCount]= calculateWaitingTime(
+                        specialyQueueCount[specialty],
+                        consultationTime[specialty]
+              );
+
+              printf("Estimated Waiting Time: %d minutes\n", waitingTime[patientCount]);
+              specialyQueueCount[specialty]++;
+
               printf("Is Patient Admitted to the Ward? (1=Yes, 0=No):");
               scanf("%d", &admittedToWard[patientCount]);
                    if (admittedToWard[patientCount]==1){
