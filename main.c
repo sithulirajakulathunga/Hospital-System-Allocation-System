@@ -65,7 +65,7 @@ float calculateEmergencySurcharge(float basefee,int emergencyLevel)
 
 
 // Calculate Ward Cost
-float calculateWardCost(int admittedToWar,int daysAdmitted,int ward,float wardDailyRate[])
+float calculateWardCost(int admittedToWard,int daysAdmitted,int ward,float wardDailyRate[])
 {
     if (admittedToWard == 1){
         return daysAdmitted * wardDailyRate [ward];
@@ -80,6 +80,26 @@ float calculateWardCost(int admittedToWar,int daysAdmitted,int ward,float wardDa
 float calculateGrossTotal(float basefee,float surcharge,float wardCost)
 {
     return basefee + surcharge + wardCost;
+}
+
+
+// Calculate Age Subsidy Discount
+float calculateAgeSubsidyDiscount(int age,float grossTotal)
+{
+    if(age<5 || age > 65)
+    {
+        return grossTotal * 0.15;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+// Calculate Final Payable Amount
+float calculateFinalPayableAmount(float grossTotal,float discount)
+{
+    return grossTotal - discount;
 }
 
 int main()
@@ -138,6 +158,8 @@ int main()
                    float basefee;
                    float wardCost;
                    float grossTotal;
+                   float discount;
+                   float finalPayableAmount;
 
                    basefee = consultationFee[specialty];
 
@@ -161,11 +183,23 @@ int main()
                         wardCost
                    );
 
+                   discount = calculateAgeSubsidyDiscount(
+                        patientAge[patientCount],
+                        grossTotal
+                   );
+
+                   finalPayableAmount = calculateFinalPayableAmount(
+                        grossTotal,
+                        discount
+                   );
+
 
                    printf("Base Consaltation Fee = %.2f\n ",basefee);
                    printf("Emergency Surcharge   = %.2f\n ",surcharge);
                    printf("Ward Cost   = %.2f\n ",wardCost);
                    printf("Gross Total = %.2f\n ",grossTotal);
+                   printf("Age Subsidy Discount = %.2f\n",discount);
+                   printf("Final Amount Payable = %.2f\n",finalPayableAmount);
 
                    patientCount++;
                    printf("Patient Registration is Successful!\n");
