@@ -31,7 +31,7 @@ float wardDailyRate[]={
 };
 int bedCapacity[]={20,10,10,5};
 int bedOccupancy[4][20]={0};
-int patientName[100][50];
+char patientName[100][50];
 int patientAge[100];
 int emergencyLevel[100];
 int patientSpecialty[100];
@@ -42,9 +42,44 @@ int specialyQueueCount[4]={0};
 int waitingTime[100];
 int patientCount = 0;
 
+// Calculate waiting time
 int calculateWaitingTime(int specialyQueueCount,int consultationTime)
 {
         return specialyQueueCount * consultationTime;
+}
+
+// Calculate Emergency Surcharge
+float calculateEmergencySurcharge(float basefee,int emergencyLevel)
+{
+    if (emergencyLevel == 1){
+        return 0;
+    }
+    else if (emergencyLevel == 2){
+        return basefee * 0.20;
+    }
+    else if (emergencyLevel == 3){
+        return basefee * 0.50;
+    }
+    return 0;
+}
+
+
+// Calculate Ward Cost
+float calculateWardCost(int admittedToWar,int daysAdmitted,int ward,float wardDailyRate[])
+{
+    if (admittedToWard == 1){
+        return daysAdmitted * wardDailyRate [ward];
+    }
+    else{
+        return 0;
+    }
+}
+
+
+// Calculate Gross Total
+float calculateGrossTotal(float basefee,float surcharge,float wardCost)
+{
+    return basefee + surcharge + wardCost;
 }
 
 int main()
@@ -66,7 +101,7 @@ int main()
        switch(choice){
           case 1:
               printf("======== Patient Registration ========\n");
-              printf("Please Enter Patient Name:  ");
+              printf("Please Enter Patient Name:  ");  //patient details
               scanf(" %[^\n]",patientName[patientCount]);
               printf("Please Enter Patient Age:  ");
               scanf("%d", &patientAge[patientCount]);
@@ -86,7 +121,7 @@ int main()
               specialyQueueCount[specialty]++;
 
               printf("Is Patient Admitted to the Ward? (1=Yes, 0=No):");
-              scanf("%d", &admittedToWard[patientCount]);
+              scanf("%d", &admittedToWard[patientCount]);// ward details
                    if (admittedToWard[patientCount]==1){
                     printf("Please Enter Ward ID (1-4):");
                     scanf("%d", &patientWard[patientCount]);
@@ -97,9 +132,46 @@ int main()
                     patientWard[patientCount]=0;
                     daysAdmitted[patientCount]=0;
                    }
+
+                   // bill calculation
+                   float surcharge;
+                   float basefee;
+                   float wardCost;
+                   float grossTotal;
+
+                   basefee = consultationFee[specialty];
+
+                   surcharge = calculateEmergencySurcharge(
+                        basefee,
+                        emergencyLevel[patientCount]
+                   );
+
+                   int ward = patientWard[patientCount] - 1;
+
+                   wardCost = calculateWardCost(
+                        admittedToWard[patientCount],
+                        daysAdmitted[patientCount],
+                        ward,
+                        wardDailyRate
+                   );
+
+                   grossTotal = calculateGrossTotal(
+                        basefee,
+                        surcharge,
+                        wardCost
+                   );
+
+
+                   printf("Base Consaltation Fee = %.2f\n ",basefee);
+                   printf("Emergency Surcharge   = %.2f\n ",surcharge);
+                   printf("Ward Cost   = %.2f\n ",wardCost);
+                   printf("Gross Total = %.2f\n ",grossTotal);
+
                    patientCount++;
                    printf("Patient Registration is Successful!\n");
+
               break;
+
           case 2:
               printf("======== Bed Availability ========\n");
                 for (int i=0; i<4; i++){
