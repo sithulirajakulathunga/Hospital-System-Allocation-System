@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int specialtyID[]= {1,2,3,4};
 char specialtyName [][40]={
@@ -40,6 +41,7 @@ int daysAdmitted[100];
 int patientWard[100];
 int specialyQueueCount[4]={0};
 int waitingTime[100];
+int patientOrder[100];
 int patientCount = 0;
 
 // Calculate waiting time
@@ -100,6 +102,32 @@ float calculateAgeSubsidyDiscount(int age,float grossTotal)
 float calculateFinalPayableAmount(float grossTotal,float discount)
 {
     return grossTotal - discount;
+}
+
+
+// sort patient's by emergency priority
+void sortByEmergencyPriority()
+{
+    int i,j;
+    int temporaryValue;
+
+    for (i=0; i<patientCount; i++)
+    {
+       patientOrder[i] = i;
+    }
+    for (i=0;i < patientCount-1;i++)
+    {
+        for(j=0; j<patientCount -1-i; j++)
+        {
+            if(emergencyLevel[patientOrder[j]]<emergencyLevel[patientOrder[j+1]])
+            {
+                temporaryValue= patientOrder[j];
+                patientOrder[j] = patientOrder [j+1];
+                patientOrder[j+1] = temporaryValue;
+
+            }
+        }
+    }
 }
 
 int main()
@@ -224,23 +252,33 @@ int main()
 
           case 3:
               printf("======== Patient Records ========\n");
+
+              sortByEmergencyPriority();
+
               if (patientCount==0){
                 printf("No Patients Registerd.\n");
               }
               else{
-                for (int i =0; i<patientCount; i++){
-                    printf("Patient %d\n", i+1);
-                    printf("Name: %s\n",patientName[i]);
-                    printf("Age:%d\n",patientAge[i]);
-                    printf("Emergency Level:%d\n",emergencyLevel[i]);
-                    printf("Specialty ID:%d\n",patientSpecialty[i]);
-                            if(admittedToWard[i]==1){
-                                printf("Ward ID: %d\n",patientWard[i]);
-                                printf("Days Admitted: %d\n", daysAdmitted[i]);
-                            }
-                            else {
-                                printf("Patient is not admitted to a ward (Outpatient/OPD)\n");
-                            }
+                for (int i =0; i<patientCount; i++)
+                {
+                    int patientIndex = patientOrder[i];
+
+                    printf("Patient %d\n",patientIndex+1);
+                    printf("Name: %s\n",patientName[patientIndex]);
+                    printf("Age:%d\n",patientAge[patientIndex]);
+                    printf("Emergency Level:%d\n",emergencyLevel[patientIndex]);
+                    printf("Specialty ID:%d\n",patientSpecialty[patientIndex]);
+
+                    if(admittedToWard[patientIndex]==1)
+                    {
+                    printf("Ward ID: %d\n", patientWard[patientIndex]);
+                    printf("Days Admitted: %d\n", daysAdmitted[patientIndex]);
+                    }
+
+                    else
+                    {
+                     printf("Patient is not admitted to a ward (Outpatient/OPD)\n");
+                    }
                 }
               }
               break;
