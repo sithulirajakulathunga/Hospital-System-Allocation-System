@@ -43,6 +43,7 @@ int specialyQueueCount[4]={0};
 int waitingTime[100];
 int patientOrder[100];
 int patientCount = 0;
+int patientBed[100];
 
 // Calculate waiting time
 int calculateWaitingTime(int specialyQueueCount,int consultationTime)
@@ -197,8 +198,9 @@ void DisplayFinalBill(int patientIndex)
 
     if(admittedToWard[patientIndex]==1)
     {
-        printf("Assigned Ward          : %s\n",
-               wardName[patientWard[patientIndex]-1]);
+        printf("Assigned Ward          : %s (Bed #%02d)\n",
+               wardName[patientWard[patientIndex]-1],
+               patientBed[patientIndex]);
     }
     else
     {
@@ -264,6 +266,26 @@ void DisplayFinalBill(int patientIndex)
 
     printf("\n==============================================================\n");
 }
+
+// Bed Allocation
+int allocateBed(int ward)
+{
+    for(int i=0; i < bedCapacity[ward]; i++)
+    {
+        if(bedOccupancy[ward][i]==0)
+        {
+            bedOccupancy[ward][i]= 1;
+            return i + 1;
+        }
+    }
+    return 0;
+}
+
+
+
+
+
+
 int main()
 {
     int choice;
@@ -304,15 +326,36 @@ int main()
 
               printf("Is Patient Admitted to the Ward? (1=Yes, 0=No):");
               scanf("%d", &admittedToWard[patientCount]);// ward details
-                   if (admittedToWard[patientCount]==1){
+                if (admittedToWard[patientCount]==1)
+                {
                     printf("Please Enter Ward ID (1-4):");
                     scanf("%d", &patientWard[patientCount]);
+
                     printf("Please Enter Days Admitted: ");
                     scanf("%d", &daysAdmitted[patientCount]);
+
+                    int ward = patientWard[patientCount] - 1;
+
+                    patientBed[patientCount] = allocateBed(ward);
+
+                    if(patientBed[patientCount]==0)
+                    {
+                        printf("No beds available in this ward.\n");
+                        patientWard[patientCount]=0;
+                        daysAdmitted[patientCount]=0;
+                        patientBed[patientCount] = 0;
+                        admittedToWard[patientCount]=0;
+                    }
+                   else
+                   {
+                       printf("Bed Allocated Successfully : Bed #%02d\n",patientBed[patientCount]);
                    }
-                   else{
+                }
+
+                else{
                     patientWard[patientCount]=0;
                     daysAdmitted[patientCount]=0;
+                    patientBed[patientCount]=0;
                    }
 
                    // bill calculation
