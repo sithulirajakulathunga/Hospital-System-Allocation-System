@@ -130,6 +130,140 @@ void sortByEmergencyPriority()
     }
 }
 
+
+// Display Final Bill
+
+void DisplayFinalBill(int patientIndex)
+{
+    int specialty = patientSpecialty[patientIndex] -1;
+
+    float basefee = consultationFee[specialty];
+    float surcharge = calculateEmergencySurcharge(
+        basefee,
+        emergencyLevel[patientIndex]
+    );
+    float wardCost;
+
+    if (admittedToWard[patientIndex]==1)
+    {
+        int ward = patientWard[patientIndex] -1;
+        wardCost = calculateWardCost(
+            admittedToWard[patientIndex],
+            daysAdmitted[patientIndex],
+            ward,
+            wardDailyRate
+        );
+    }
+    else
+    {
+        wardCost = 0;
+    }
+
+    float grossTotal = calculateGrossTotal(
+            basefee,
+            surcharge,
+            wardCost
+    );
+
+    float discount = calculateAgeSubsidyDiscount(
+        patientAge[patientIndex],
+        grossTotal
+    );
+
+    float finalPayableAmount =  calculateFinalPayableAmount(
+        grossTotal,
+        discount
+    );
+
+    printf("\n==============================================================\n");
+    printf("                SMART HOSPITAL ADMISSION & BILL\n");
+    printf("--------------------------------------------------------------\n");
+
+    printf("Patient ID             : PAT-100%d\n",patientIndex +1);
+    printf("Patient Name           : %s\n",patientName[patientIndex]);
+    printf("Age                    : %d Years",patientAge[patientIndex]);
+
+    if (patientAge[patientIndex]<5 || patientAge[patientIndex]>65)
+    {
+        printf(" (15%% Subsidy Eligible)\n");
+    }
+    else
+    {
+        printf(" (0%% Subsidy Eligible)\n");
+    }
+
+    printf("Specialty              : %s\n",specialtyName[specialty]);
+
+
+    if(admittedToWard[patientIndex]==1)
+    {
+        printf("Assigned Ward          : %s\n",
+               wardName[patientWard[patientIndex]-1]);
+    }
+    else
+    {
+        printf("Assigned Ward          : None (OPD)\n");
+    }
+
+    printf("Urgency Level          : Level %d",emergencyLevel[patientIndex]);
+
+
+    if (emergencyLevel[patientIndex]==1)
+    {
+        printf("(Normal)\n");
+    }
+    else if (emergencyLevel[patientIndex]==2)
+    {
+        printf("(Urgent)\n");
+    }
+    else if (emergencyLevel[patientIndex]==3)
+    {
+        printf("(Critical)\n");
+    }
+
+    printf("--------------------------------------------------------------\n");
+    printf("Base Consulation Fee   : LKR %.2f\n",basefee);
+    printf("Emergency Surcharge    : LKR %.2f",surcharge);
+    if (emergencyLevel[patientIndex]==1)
+    {
+        printf("(0%%)\n");
+    }
+    else if(emergencyLevel[patientIndex]==2)
+    {
+        printf("(20%%)\n");
+    }
+    else if (emergencyLevel[patientIndex]==3)
+    {
+        printf("(50%%)\n");
+    }
+    printf("Ward Stay Cost (%d days): LKR %.2f\n",
+            daysAdmitted[patientIndex],
+            wardCost);
+    printf("--------------------------------------------------------------\n");
+    printf("Gross Total Bill       : LKR %.2f\n",grossTotal);
+    if (patientAge[patientIndex] < 5 || patientAge[patientIndex] > 65)
+    {
+        printf("Age Subsidy Discount   : LKR -%.2f (15%%)\n",discount);
+    }
+    else
+    {
+        printf("Age Subsidy Discount   : LKR %.2f (0%%)\n",discount);
+    }
+
+    printf("--------------------------------------------------------------\n");
+    printf("Final Payable Amount   : LKR %.2f\n",finalPayableAmount);
+    if (waitingTime[patientIndex]==0)
+    {
+        printf("Estimated Waiting Time : %.2f mins (Immediate Attention)",(float)waitingTime[patientIndex]);
+
+    }
+    else
+    {
+        printf("Estimated Waiting Time : %.2f mins",(float)waitingTime[patientIndex]);
+    }
+
+    printf("\n==============================================================\n");
+}
 int main()
 {
     int choice;
@@ -279,9 +413,12 @@ int main()
                     {
                      printf("Patient is not admitted to a ward (Outpatient/OPD)\n");
                     }
+
+                    DisplayFinalBill(patientIndex);
                 }
               }
               break;
+
           case 4:
               printf("Generate Reports Selected\n");
               break;
