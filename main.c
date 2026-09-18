@@ -144,6 +144,191 @@ float calculateFinalPayableAmount(float grossTotal,float discount)
 }
 
 
+// Display patients by emergency level
+void displaypatientsByUrgency()
+{
+    int normal = 0;
+    int urgent = 0;
+    int critical = 0;
+
+    for(int i=0; i <patientCount; i++)
+    {
+        if(emergencyLevel[i]==1)
+        {
+            normal++;
+        }
+        else if(emergencyLevel[i]==2)
+        {
+            urgent++;
+        }
+        else if(emergencyLevel[i]==3)
+        {
+            critical++;
+        }
+    }
+
+printf("\n========================================\n");
+printf("       PATIENTS BY URGENCY LEVEL\n");
+printf("========================================\n");
+printf("Normal   (Level 1) : %d\n",normal);
+printf("Urgent   (Level 2) : %d\n",urgent);
+printf("Critical (Level 3) : %d\n",critical);
+}
+
+
+// Display total revenue & total discount
+void displayRevenueAndDiscounts()
+{
+    float totalRevenue = 0;
+    float totalDiscounts = 0;
+
+    for(int i =0; i< patientCount; i++)
+    {
+        int specialty = patientSpecialty[i] - 1;
+        float basefee = consultationFee[specialty];
+        float surcharge = calculateEmergencySurcharge(
+            basefee,
+            emergencyLevel[i]
+        );
+        float wardCost = 0;
+
+        if (admittedToWard[i]==1)
+        {
+            int ward = patientWard[i]-1;
+
+            wardCost = calculateWardCost(
+                admittedToWard[i],
+                daysAdmitted[i],
+                ward,
+                wardDailyRate
+            );
+        }
+        float grossTotal = calculateGrossTotal(
+            basefee,
+            surcharge,
+            wardCost
+        );
+
+        float discount = calculateAgeSubsidyDiscount(
+            patientAge[i],
+            grossTotal
+        );
+
+        float finalPayableAmount = calculateFinalPayableAmount(
+            grossTotal,
+            discount
+        );
+
+        totalRevenue += finalPayableAmount;
+        totalDiscounts += discount;
+    }
+
+    printf("\n========================================\n");
+    printf("       REVENUE & DISCOUNT REPORT\n");
+    printf("========================================\n");
+    printf("Total Revenue   : LKR %.2f\n",totalRevenue);
+    printf("Total Discounts : LKR %.2f\n",totalDiscounts);
+}
+
+// Display bed occupancy and percentage per ward
+void displayBedOccupancyReport()
+{
+    printf("\n========================================\n");
+    printf("          BED OCCUPANCY REPORT\n");
+    printf("========================================\n");
+
+    for(int i =0; i<4; i++)
+    {
+        int occpiedBeds = 0;
+
+        for (int j =0; j< bedCapacity[i]; j++)
+        {
+            if(bedOccupancy[i][j]==1)
+            {
+                occpiedBeds++;
+            }
+        }
+        float occupancyPercentage = ((float)occpiedBeds / bedCapacity[i]) * 100;
+
+        printf("%s\n",wardName[i]);
+        printf("Occupied Beds : %d/%d\n",occpiedBeds,bedCapacity[i]);
+        printf("Occupancy     : %.2f%%\n",occupancyPercentage);
+        printf("---------------------------------------\n");
+    }
+}
+
+
+// Display highest paying patient
+void displayHighestPayingPatient()
+{
+    if(patientCount==0)
+    {
+        printf("No Patients Registerd\n");
+        return;
+    }
+
+    int highestPatient = 0;
+    float highestBill = 0;
+
+    for (int i = 0; i< patientCount; i++)
+    {
+        int specialty = patientSpecialty[i] -1;
+        float basefee = consultationFee[specialty];
+        float surcharge = calculateEmergencySurcharge(
+            basefee,
+            emergencyLevel[i]
+        );
+
+        float wardCost = 0;
+
+        if(admittedToWard[i]==1)
+        {
+            int ward = patientWard[i] - 1;
+
+            wardCost = calculateWardCost(
+                admittedToWard[i],
+                daysAdmitted[i],
+                ward,
+                wardDailyRate
+            );
+        }
+
+        float grossTotal = calculateGrossTotal(
+            basefee,
+            surcharge,
+            wardCost
+        );
+
+        float discount = calculateAgeSubsidyDiscount(
+            patientAge[i],
+            grossTotal
+        );
+
+        float finalPayableAmount = calculateFinalPayableAmount(
+                        grossTotal,
+                        discount
+        );
+
+        if(finalPayableAmount > highestBill)
+        {
+            highestBill = finalPayableAmount;
+            highestPatient = i;
+        }
+    }
+
+    printf("\n========================================\n");
+    printf("           HIGHEST PAYING PATIENT\n");
+    printf("========================================\n");
+    printf("Patient ID    : PAT-100%d\n",highestPatient+1);
+    printf("Patient Name  : %s\n",patientName[highestPatient]);
+    printf("Total Bill    : LKR %.2f\n",highestBill);
+}
+
+
+
+
+
+
 // sort patient's by emergency priority
 void sortByEmergencyPriority()
 {
@@ -581,11 +766,16 @@ int main()
               break;
 
           case 4:
-              printf("Generate Reports Selected\n");
+              displaypatientsByUrgency();
+              displayRevenueAndDiscounts();
+              displayBedOccupancyReport();
+              displayHighestPayingPatient();
               break;
+
           case 5:
               printf("Exit From The System\n");
               break;
+
           default:
               printf("Invalid Choice,Please Try Again.\n");
        }
