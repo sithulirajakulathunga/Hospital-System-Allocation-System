@@ -16,7 +16,7 @@ float consultationFee[]={
     5000.00
 };
 int consultationTime[]={15,20,30,30};
-int dailyPatientCap[]= {30,20,12,10};
+int dailyPatientCapacity[]= {30,20,12,10};
 int wardID[]={1,2,3,4};
 char wardName[][40]={
      "General Ward",
@@ -319,6 +319,12 @@ int allocateBed(int ward)
     return 0;
 }
 
+// Daily patient capacity
+int checkDailyPatientCapacity(int specialty,int queueCount)
+{
+    return queueCount < dailyPatientCapacity[specialty];
+}
+
 
 
 
@@ -387,6 +393,13 @@ int main()
 
 
               int specialty = patientSpecialty[patientCount]-1;
+
+              if(!checkDailyPatientCapacity(specialty,specialyQueueCount[specialty]))
+              {
+                  printf("Daily Patient Capacity Reached for this Specialty\n");
+                  break;
+              }
+
 
               waitingTime[patientCount]= calculateWaitingTime(
                         specialyQueueCount[specialty],
