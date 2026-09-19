@@ -504,6 +504,52 @@ int allocateBed(int ward)
     return 0;
 }
 
+
+// Save bed occupancy status to file
+void saveBedStatus()
+{
+    FILE * file = fopen("beds_status.txt","w");
+
+    if(file == NULL)
+    {
+        printf("Error in opening bed_status.txt\n");
+        return;
+    }
+
+    for (int i = 0; i<4; i++)
+    {
+        for (int j=0; j< bedCapacity[i]; j++)
+        {
+            fprintf(file, "%d ", bedOccupancy[i][j]);
+        }
+
+        fprintf(file, "\n");
+    }
+    fclose(file);
+}
+
+// Load bed occupancy status
+void loadBedStatus()
+{
+    FILE * file = fopen("beds_status.txt", "r");
+
+    if(file == NULL)
+    {
+        return;
+    }
+
+    for (int i=0; i<4; i++)
+    {
+        for (int j=0; j< bedCapacity[i]; j++)
+        {
+            fscanf(file, "%d", &bedOccupancy[i][j]);
+        }
+    }
+    fclose(file);
+}
+
+
+
 // Daily patient capacity
 int checkDailyPatientCapacity(int specialty,int queueCount)
 {
@@ -511,6 +557,65 @@ int checkDailyPatientCapacity(int specialty,int queueCount)
 }
 
 
+// save patient billing record to file
+void savePatientRecord(int patientIndex)
+{
+    FILE * file = fopen("patient_records.txt", "a");
+
+    if(file == NULL)
+    {
+        printf("Error opening patient_records.txt\n");
+        return;
+    }
+    int specialty = patientSpecialty[patientIndex] - 1;
+    int basefee = consultationFee[specialty];
+    float surcharge = calculateEmergencySurcharge(
+       basefee,
+       emergencyLevel[patientIndex]
+    );
+    float wardCost = 0;
+
+    if(admittedToWard[patientIndex]==1)
+    {
+        int ward = patientWard[patientIndex] - 1;
+
+        wardCost = calculateWardCost(
+            admittedToWard[patientIndex],
+            daysAdmitted[patientIndex],
+            ward,
+            wardDailyRate
+        );
+
+    }
+    float grossTotal = calculateGrossTotal(
+        basefee,
+        surcharge,
+        wardCost
+    );
+
+    float discount = calculateAgeSubsidyDiscount(
+        patientAge[patientIndex],
+        grossTotal
+    );
+
+    float finalPayableAmount = calculateFinalPayableAmount(
+        grossTotal,
+        discount
+    );
+
+    fprintf(file, "Patient ID         : PAT-100%d\n",patientIndex+1);
+    fprintf(file, "Patient Name       : %s\n",patientName[patientIndex]);
+    fprintf(file, "Patient Age        : %d\n",patientAge[patientIndex]);
+    fprintf(file, "Specialty          : %s\n",specialtyName[specialty]);
+    fprintf(file, "Emergency Level    : %d\n",emergencyLevel[patientIndex]);
+    fprintf(file, "Gross Total        : LKR %.2f\n",grossTotal);
+    fprintf(file, "Discount           : LKR %.2f\n",discount);
+    fprintf(file, "Final Payable      : LKR %.2f\n",finalPayableAmount);
+    fprintf(file, "--------------------------------------------------------------\n");
+    fclose(file);
+
+
+}
 
 
 
@@ -518,6 +623,8 @@ int checkDailyPatientCapacity(int specialty,int queueCount)
 int main()
 {
     int choice;
+
+    loadBedStatus();
     do{
 
     printf("=========================================================\n");
@@ -652,6 +759,8 @@ int main()
                    else
                    {
                        printf("Bed Allocated Successfully : Bed #%02d\n",patientBed[patientCount]);
+
+                       saveBedStatus();
                    }
                 }
 
@@ -710,6 +819,7 @@ int main()
                    printf("Final Amount Payable = %.2f\n",finalPayableAmount);
 
                    patientCount++;
+                   savePatientRecord(patientCount - 1);
                    printf("Patient Registration is Successful!\n");
 
               break;

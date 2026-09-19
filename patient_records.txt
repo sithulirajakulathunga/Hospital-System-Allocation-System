@@ -1,0 +1,18 @@
+Patient ID         : PAT-1001
+Patient Name       : kamal
+Patient Age        : 30
+Specialty          : General Practice (OPD)
+Emergency Level    : 2
+Gross Total        : LKR 1800.00
+Discount           : LKR 0.00
+Final Payable      : LKR 1800.00
+--------------------------------------------------------------
+Patient ID         : PAT-1002
+Patient Name       : namal
+Patient Age        : 30
+Specialty          : Cardiology
+Emergency Level    : 2
+Gross Total        : LKR 5400.00
+Discount           : LKR 0.00
+Final Payable      : LKR 5400.00
+--------------------------------------------------------------
